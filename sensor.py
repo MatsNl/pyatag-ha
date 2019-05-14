@@ -1,15 +1,17 @@
-"""Setup the Atag One sensors."""
+"""Initialization of ATAG One sensor platform."""
 import logging
-from homeassistant.core import callback, asyncio
+from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import CONF_SENSORS
-from .const import (DOMAIN, ATAG_HANDLE, SENSOR_PREFIX, SIGNAL_UPDATE_ATAG, SENSOR_TYPES, ATTR_REPORT_TIME, BOILER_STATES, BOILER_STATUS, RETRIEVE_REPLY, REPORT, DETAILS )
+from pyatag.const import (DOMAIN, ATAG_HANDLE, SENSOR_PREFIX, SIGNAL_UPDATE_ATAG, SENSOR_TYPES,
+                          ATTR_REPORT_TIME)
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    _LOGGER.debug("Initializing Atag sensor platform")
+
+async def async_setup_platform(hass, _config, async_add_entities, discovery_info=None):
+    """Initialization of ATAG One sensor platform."""
     atag = hass.data[DOMAIN][ATAG_HANDLE]
     entities = []
     if not CONF_SENSORS in discovery_info:
@@ -26,6 +28,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         entities.append(AtagOneSensor(atag, sensor_type))
 
     async_add_entities(entities)
+
 
 class AtagOneSensor(Entity):
     """Representation of a AtagOne Sensor."""

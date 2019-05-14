@@ -1,1 +1,1 @@
-pyatag-ha
+Homeassistant component to interface with ATAG One Thermostat

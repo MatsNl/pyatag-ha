@@ -1,26 +1,34 @@
+"""Initialization of ATAG One climate platform."""
 import logging
 from homeassistant.components.climate.const import (
     STATE_AUTO, STATE_MANUAL, SUPPORT_TARGET_TEMPERATURE, SUPPORT_OPERATION_MODE)
-from homeassistant.components.climate import ClimateDevice
-from homeassistant.const import TEMP_CELSIUS
+#    , SUPPORT_TARGET_HUMIDITY_LOW,
+#    SUPPORT_TARGET_HUMIDITY_HIGH)
+from homeassistant.components.climate import (ClimateDevice)
+from homeassistant.const import TEMP_CELSIUS  # , STATE_UNKNOWN, STATE_OFF
 
-from homeassistant.core import callback, asyncio
+from homeassistant.core import callback  # , asyncio
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util.temperature import convert as convert_temperature
-from .const import *
-from .errors import *
+from pyatag.const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG, ATTR_CURRENT_TEMPERATURE,
+                          ATTR_TEMPERATURE, ATTR_OPERATION_MODE, DEFAULT_MAX_TEMP, DEFAULT_MIN_TEMP)
+# from pyatag.errors import *
 
-SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE | SUPPORT_OPERATION_MODE)
+SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE | SUPPORT_OPERATION_MODE)  # |
+#                 SUPPORT_TARGET_HUMIDITY_LOW | SUPPORT_TARGET_HUMIDITY_HIGH)
 
 OPERATION_LIST = [STATE_MANUAL, STATE_AUTO]
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
+
+async def async_setup_platform(hass, _config, async_add_devices,
+                               _discovery_info=None):
     """Setup for the Atag One thermostat."""
     async_add_devices([AtagOneThermostat(hass)])
 
-class AtagOneThermostat(ClimateDevice):
+
+class AtagOneThermostat(ClimateDevice): # pylint: disable=abstract-method
     """Representation of the ATAG One thermostat."""
 
     def __init__(self, hass):
@@ -28,6 +36,7 @@ class AtagOneThermostat(ClimateDevice):
         _LOGGER.debug("Initializing Atag climate platform")
         self.atag = hass.data[DOMAIN][ATAG_HANDLE]
         self._name = 'Atag thermostat'
+        #self._operation_list = [STATE_MANUAL, STATE_AUTO]
         _LOGGER.debug("Atag climate initialized")
 
     async def async_added_to_hass(self):
