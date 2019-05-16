@@ -15,7 +15,6 @@ from homeassistant.core import callback, asyncio
 from pyatag.const import (DOMAIN, ATAG_HANDLE, DEFAULT_TIMEOUT, SENSOR_TYPES,
                           SIGNAL_UPDATE_ATAG, DATA_LISTENER, DEFAULT_PORT,
                           CONF_INTERFACE, DEFAULT_INTERFACE)
-from pyatag import gateway
 
 DEFAULT_SCAN_INTERVAL = timedelta(seconds=120)
 _LOGGER = logging.getLogger(__name__)
@@ -46,8 +45,9 @@ async def async_setup(hass, config):
     sensors = conf.get(CONF_SENSORS)
     httpsession = hass.helpers.aiohttp_client.async_get_clientsession()
 
-    _LOGGER.debug('Initializing Datastore... %s', _LOGGER.name)
-    atagunit = gateway.AtagDataStore(
+    _LOGGER.debug('Initializing ATAG...')
+    from pyatag.gateway import AtagDataStore
+    atagunit = AtagDataStore(
         host=host, port=port, mail=email, interface=interface, session=httpsession, sensors=sensors)
     await atagunit.async_check_pair_status()
     hass.data[DOMAIN][ATAG_HANDLE] = atagunit
@@ -74,3 +74,4 @@ async def async_setup(hass, config):
     hass.data[DOMAIN][DATA_LISTENER] = async_track_time_interval(
         hass, async_hub_refresh, scan_interval)
     return True
+    
