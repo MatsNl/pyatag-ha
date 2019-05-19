@@ -9,6 +9,7 @@
        "resources": [
            "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/climate.py",
            "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/sensor.py",
+           "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/manifest.json",
            "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/services.yaml"
         ]
     }

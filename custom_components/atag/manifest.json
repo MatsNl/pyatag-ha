@@ -1,0 +1,8 @@
+{
+    "domain": "atag",
+    "name": "Atag",
+    "documentation": "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/README.md",
+    "dependencies": ["pyatag==0.1.5"],
+    "codeowners": ["@MatsNL"],
+    "requirements": []
+  }
