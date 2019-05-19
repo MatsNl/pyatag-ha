@@ -4,15 +4,17 @@ from homeassistant.components.climate.const import (
     STATE_AUTO, STATE_MANUAL, SUPPORT_TARGET_TEMPERATURE, SUPPORT_OPERATION_MODE)
 #    , SUPPORT_TARGET_HUMIDITY_LOW,
 #    SUPPORT_TARGET_HUMIDITY_HIGH)
-from homeassistant.components.climate import (ClimateDevice)
-from homeassistant.const import TEMP_CELSIUS  # , STATE_UNKNOWN, STATE_OFF
-
 from homeassistant.core import callback  # , asyncio
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
+
+from homeassistant.const import (TEMP_CELSIUS, ATTR_TEMPERATURE)
+
+from homeassistant.components.climate import (ClimateDevice)
+from homeassistant.components.climate.const import (ATTR_CURRENT_TEMPERATURE, ATTR_OPERATION_MODE,
+                                                    DEFAULT_MAX_TEMP, DEFAULT_MIN_TEMP)
+
 from homeassistant.util.temperature import convert as convert_temperature
-from pyatag.const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG, ATTR_CURRENT_TEMPERATURE,
-                          ATTR_TEMPERATURE, ATTR_OPERATION_MODE, DEFAULT_MAX_TEMP, DEFAULT_MIN_TEMP)
-# from pyatag.errors import *
+from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG)
 
 SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE | SUPPORT_OPERATION_MODE)  # |
 #                 SUPPORT_TARGET_HUMIDITY_LOW | SUPPORT_TARGET_HUMIDITY_HIGH)
@@ -28,7 +30,7 @@ async def async_setup_platform(hass, _config, async_add_devices,
     async_add_devices([AtagOneThermostat(hass)])
 
 
-class AtagOneThermostat(ClimateDevice): # pylint: disable=abstract-method
+class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
     """Representation of the ATAG One thermostat."""
 
     def __init__(self, hass):

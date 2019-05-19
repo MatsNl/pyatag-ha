@@ -4,11 +4,11 @@ from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import CONF_SENSORS
-from pyatag.const import (DOMAIN, ATAG_HANDLE, SENSOR_PREFIX, SIGNAL_UPDATE_ATAG, SENSOR_TYPES,
+from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG, SENSOR_TYPES,
                           ATTR_REPORT_TIME)
 
 _LOGGER = logging.getLogger(__name__)
-
+SENSOR_PREFIX = 'Atag '
 
 async def async_setup_platform(hass, _config, async_add_entities, discovery_info=None):
     """Initialization of ATAG One sensor platform."""
