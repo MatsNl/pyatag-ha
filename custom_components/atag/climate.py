@@ -4,7 +4,7 @@ from homeassistant.components.climate.const import (
     STATE_AUTO, STATE_MANUAL, SUPPORT_TARGET_TEMPERATURE, SUPPORT_OPERATION_MODE)
 #    , SUPPORT_TARGET_HUMIDITY_LOW,
 #    SUPPORT_TARGET_HUMIDITY_HIGH)
-from homeassistant.core import callback  # , asyncio
+from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from homeassistant.const import (TEMP_CELSIUS, ATTR_TEMPERATURE)

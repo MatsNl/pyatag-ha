@@ -3,7 +3,7 @@
     "name": "Atag",
     "documentation": "https://pypi.org/project/pyatag",
     "requirements": [
-      "pyatag==0.1.8"
+      "pyatag==0.1.9"
     ],
     "dependencies": [],
     "codeowners": [

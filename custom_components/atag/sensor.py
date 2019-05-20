@@ -4,8 +4,8 @@ from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import CONF_SENSORS
-from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG, SENSOR_TYPES,
-                          ATTR_REPORT_TIME)
+from pyatag.const import SENSOR_TYPES, ATTR_REPORT_TIME
+from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG)
 
 _LOGGER = logging.getLogger(__name__)
 SENSOR_PREFIX = 'Atag '
@@ -88,6 +88,10 @@ class AtagOneSensor(Entity):
 
     async def async_update(self):
         """Get the latest data and use it to update our sensor state."""
-        self._state = self.atag.sensordata[self._type]
-        self._attr[ATTR_REPORT_TIME] = self.atag.sensordata[ATTR_REPORT_TIME]
-        return True
+        try:
+            self._state = self.atag.sensordata[self._type]
+            self._attr[ATTR_REPORT_TIME] = self.atag.sensordata[ATTR_REPORT_TIME]
+            return True
+        except KeyError:
+            _LOGGER.debug('%s failed to update', self._name)
+            return False
