@@ -12,9 +12,11 @@ from homeassistant.const import (CONF_HOST, CONF_PORT, CONF_EMAIL, CONF_SCAN_INT
                                  CONF_SENSORS, EVENT_HOMEASSISTANT_STOP, CONF_MONITORED_CONDITIONS)
 from homeassistant.core import callback, asyncio
 
-from const import (DOMAIN, ATAG_HANDLE, SENSOR_TYPES,
+from .const import (DOMAIN, ATAG_HANDLE, SENSOR_TYPES,
                     SIGNAL_UPDATE_ATAG, DATA_LISTENER, DEFAULT_PORT,
                     CONF_INTERFACE, DEFAULT_INTERFACE)
+
+VERSION = '0.1.6'
 
 DEFAULT_SCAN_INTERVAL = timedelta(seconds=120)
 _LOGGER = logging.getLogger(__name__)
