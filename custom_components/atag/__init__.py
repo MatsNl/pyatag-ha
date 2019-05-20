@@ -9,14 +9,16 @@ from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.const import (CONF_HOST, CONF_PORT, CONF_EMAIL, CONF_SCAN_INTERVAL,
-                                 CONF_SENSORS, EVENT_HOMEASSISTANT_STOP, CONF_MONITORED_CONDITIONS)
+                                 CONF_SENSORS, EVENT_HOMEASSISTANT_STOP)
 from homeassistant.core import callback, asyncio
 
-from .const import (DOMAIN, ATAG_HANDLE, SENSOR_TYPES,
-                    SIGNAL_UPDATE_ATAG, DATA_LISTENER, DEFAULT_PORT,
+from pyatag.const import SENSOR_TYPES
+
+from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG,
+                    DATA_LISTENER, DEFAULT_PORT,
                     CONF_INTERFACE, DEFAULT_INTERFACE)
 
-VERSION = '0.1.6'
+VERSION = '0.1.8'
 
 DEFAULT_SCAN_INTERVAL = timedelta(seconds=120)
 _LOGGER = logging.getLogger(__name__)
@@ -29,7 +31,7 @@ CONFIG_SCHEMA = vol.Schema({
         vol.Optional(CONF_INTERFACE, default=DEFAULT_INTERFACE): cv.string,
         vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL):
             cv.time_period_seconds,
-        vol.Optional(CONF_MONITORED_CONDITIONS, default=SENSOR_TYPES.keys()):
+        vol.Optional(CONF_SENSORS, default=SENSOR_TYPES.keys()):
             vol.All(cv.ensure_list, [vol.In(SENSOR_TYPES)]),
     }),
 }, extra=vol.ALLOW_EXTRA)
@@ -44,14 +46,14 @@ async def async_setup(hass, config):
     interface = conf.get(CONF_INTERFACE)
     port = conf.get(CONF_PORT)
     scan_interval = conf.get(CONF_SCAN_INTERVAL)
-    sensors = conf.get(CONF_MONITORED_CONDITIONS)
+    sensors = conf.get(CONF_SENSORS)
     httpsession = hass.helpers.aiohttp_client.async_get_clientsession()
 
     _LOGGER.debug('Initializing ATAG...')
     from pyatag.gateway import AtagDataStore
     atagunit = AtagDataStore(
         host=host, port=port, mail=email, interface=interface, session=httpsession, sensors=sensors)
-    await atagunit.async_check_pair_status()
+
     hass.data[DOMAIN][ATAG_HANDLE] = atagunit
     _LOGGER.debug('Datastore initialized')
     for platform in ('sensor', 'climate'):
