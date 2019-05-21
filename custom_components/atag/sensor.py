@@ -44,7 +44,7 @@ class AtagOneSensor(Entity):
         self._state = None
         self._attr = {}
 
-        _LOGGER.debug('AtagSensor created for %s', self._name)
+        _LOGGER.debug('%s Sensor initialized', self._name)
 
     @property
     def should_poll(self):

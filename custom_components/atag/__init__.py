@@ -12,13 +12,11 @@ from homeassistant.const import (CONF_HOST, CONF_PORT, CONF_EMAIL, CONF_SCAN_INT
                                  CONF_SENSORS, EVENT_HOMEASSISTANT_STOP)
 from homeassistant.core import callback, asyncio
 
-from pyatag.const import SENSOR_TYPES
-
 from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG,
-                    DATA_LISTENER, DEFAULT_PORT,
+                    DATA_LISTENER, DEFAULT_PORT, DEFAULT_SENSORS,
                     CONF_INTERFACE, DEFAULT_INTERFACE)
 
-VERSION = '0.2.1'
+VERSION = '0.2.2'
 
 DEFAULT_SCAN_INTERVAL = timedelta(seconds=120)
 _LOGGER = logging.getLogger(__name__)
@@ -31,8 +29,8 @@ CONFIG_SCHEMA = vol.Schema({
         vol.Optional(CONF_INTERFACE, default=DEFAULT_INTERFACE): cv.string,
         vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL):
             cv.time_period_seconds,
-        vol.Optional(CONF_SENSORS, default=SENSOR_TYPES.keys()):
-            vol.All(cv.ensure_list, [vol.In(SENSOR_TYPES)]),
+        vol.Optional(CONF_SENSORS, default=DEFAULT_SENSORS):
+            vol.All(cv.ensure_list, [vol.In(DEFAULT_SENSORS)]),
     }),
 }, extra=vol.ALLOW_EXTRA)
 
