@@ -2,7 +2,7 @@
     "atag" : {
        "updated_at" : "2019-05-17",
        "local_location" : "/custom_components/atag/__init__.py",
-       "version" : "0.2.0",
+       "version" : "0.2.1",
        "changelog" : "https://github.com/MatsNl/pyatag-ha",
        "visit_repo" : "https://github.com/MatsNl/pyatag-ha",
        "remote_location" : "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/__init__.py",
