@@ -115,12 +115,24 @@ class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
         target_temp = kwargs.get(ATTR_TEMPERATURE)
-        if target_temp is None:
+        if not self._on or target_temp is None:
             return
         await self.atag.async_set_atag(_target_temp=target_temp)
+        self.async_schedule_update_ha_state(True)
 
     async def async_set_operation_mode(self, operation_mode):
         """Set ATAG ONE mode (auto, manual)."""
-        if operation_mode is None:
+        if not self._on or operation_mode is None:
             return
         await self.atag.async_set_atag(_target_mode=operation_mode)
+        self.async_schedule_update_ha_state(True)
+
+    async def async_turn_off(self):
+        """Disable Atag One (HA only)."""
+        self._on = False
+        self.async_schedule_update_ha_state(True)
+
+    async def async_turn_on(self):
+        """Enable Atag One (HA only)."""
+        self._on = True
+        self.async_schedule_update_ha_state(True)

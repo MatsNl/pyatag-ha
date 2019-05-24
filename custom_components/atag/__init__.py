@@ -49,7 +49,7 @@ async def async_setup(hass, config):
     _LOGGER.debug('Initializing ATAG...')
     from pyatag.gateway import AtagDataStore
     atagunit = AtagDataStore(
-        host=host, port=port, mail=email, interface=interface, session=httpsession, sensors=sensors)
+        host=host, port=port, mail=email, interface=interface, session=httpsession)
 
     hass.data[DOMAIN][ATAG_HANDLE] = atagunit
     _LOGGER.debug('Datastore initialized')
