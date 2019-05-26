@@ -23,8 +23,8 @@ _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
-        vol.Required(CONF_HOST): cv.string,
-        vol.Optional(CONF_EMAIL, default=None): cv.Any,
+        vol.Optional(CONF_HOST): cv.string,
+        vol.Optional(CONF_EMAIL): cv.string,
         vol.Optional(CONF_PORT, default=DEFAULT_PORT): cv.port,
         vol.Optional(CONF_INTERFACE, default=DEFAULT_INTERFACE): cv.string,
         vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL):

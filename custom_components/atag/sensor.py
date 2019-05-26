@@ -89,7 +89,11 @@ class AtagOneSensor(Entity):
     async def async_update(self):
         """Get the latest data and use it to update our sensor state."""
         try:
-            self._state = self.atag.sensordata[self._type]
+            if isinstance(self.atag.sensordata[self._type], list):
+                self._state = self.atag.sensordata[self._type][0]
+                self._icon = self.atag.sensordata[self._type][1]
+            else:
+                self._state = self.atag.sensordata[self._type]
             self._attr[ATTR_REPORT_TIME] = self.atag.sensordata[ATTR_REPORT_TIME]
             return True
         except KeyError:
