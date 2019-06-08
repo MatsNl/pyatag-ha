@@ -1,4 +1,4 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 """Constants for Homeassistant"""
 
 DOMAIN = 'atag'
@@ -28,5 +28,20 @@ DEFAULT_SENSORS = [
     'voltage',
     'current',
     'flame_level',
-    'report_time'
+    'report_time',
+    "ch_status",
+    "ch_control_mode",
+    "ch_mode_duration",
+    "dhw_temp_setp",
+    "dhw_status",
+    "dhw_mode",
+    "dhw_mode_temp",
+    "weather_status",
+    "vacation_duration",
+    "extend_duration",
+    "fireplace_duration",
+    "device_id",
+    "device_status",
+    "connection_status",
+    "date_time"
 ]

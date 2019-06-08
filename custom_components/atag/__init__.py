@@ -16,9 +16,9 @@ from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG,
                     DATA_LISTENER, DEFAULT_PORT, DEFAULT_SENSORS,
                     CONF_INTERFACE, DEFAULT_INTERFACE)
 
-VERSION = '0.2.3'
+VERSION = '0.2.4'
 
-DEFAULT_SCAN_INTERVAL = timedelta(seconds=120)
+DEFAULT_SCAN_INTERVAL = 30
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = vol.Schema({
@@ -26,7 +26,7 @@ CONFIG_SCHEMA = vol.Schema({
         vol.Optional(CONF_HOST): cv.string,
         vol.Optional(CONF_EMAIL): cv.string,
         vol.Optional(CONF_PORT, default=DEFAULT_PORT): cv.port,
-        vol.Optional(CONF_INTERFACE, default=DEFAULT_INTERFACE): cv.string,
+        vol.Optional(CONF_INTERFACE): cv.string,
         vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL):
             cv.time_period_seconds,
         vol.Optional(CONF_SENSORS, default=DEFAULT_SENSORS):
