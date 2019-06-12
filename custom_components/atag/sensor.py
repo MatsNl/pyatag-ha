@@ -21,7 +21,7 @@ async def async_setup_platform(hass, _config, async_add_entities, discovery_info
         sensor_type = sensor.lower()
 
         if sensor_type not in SENSOR_TYPES:
-            _LOGGER.warning("Unknown %s sensor in config")
+            _LOGGER.warning("Unknown %s sensor in config", sensor_type)
             SENSOR_TYPES[sensor_type] = [
                 sensor_type.title(), '', 'mdi:flash', sensor_type.title()]
 

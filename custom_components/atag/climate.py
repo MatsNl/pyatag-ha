@@ -2,10 +2,10 @@
 import logging
 from homeassistant.components.climate import (ClimateDevice)
 from homeassistant.components.climate.const import (
-    STATE_HEAT, STATE_AUTO, SUPPORT_TARGET_TEMPERATURE, SUPPORT_OPERATION_MODE,
+    STATE_AUTO, STATE_MANUAL, SUPPORT_TARGET_TEMPERATURE, SUPPORT_OPERATION_MODE,
     SUPPORT_TARGET_HUMIDITY_LOW, SUPPORT_TARGET_HUMIDITY_HIGH, ATTR_CURRENT_TEMPERATURE,
     ATTR_OPERATION_MODE, DEFAULT_MAX_TEMP, DEFAULT_MIN_TEMP, SUPPORT_ON_OFF)
-from homeassistant.const import (TEMP_CELSIUS, ATTR_TEMPERATURE)
+from homeassistant.const import (TEMP_CELSIUS, ATTR_TEMPERATURE, STATE_OFF)
 
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -16,10 +16,11 @@ from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG)
 SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE | SUPPORT_OPERATION_MODE |
                  SUPPORT_TARGET_HUMIDITY_LOW | SUPPORT_TARGET_HUMIDITY_HIGH | SUPPORT_ON_OFF)
 
-OPERATION_LIST = [STATE_HEAT, STATE_AUTO]
+OPERATION_LIST = [STATE_MANUAL, STATE_AUTO, STATE_OFF]
 
 _LOGGER = logging.getLogger(__name__)
 
+DEVICE_ID = 'device_id'
 
 async def async_setup_platform(hass, _config, async_add_devices,
                                _discovery_info=None):
@@ -49,6 +50,11 @@ class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
     def _update_callback(self):
         """Call update method."""
         self.async_schedule_update_ha_state(True)
+
+    @property
+    def device_id(self) -> str:
+        """Return the unique ID for this thermostat."""
+        return self.atag.sensordata[DEVICE_ID]
 
     @property
     def should_poll(self):
@@ -86,6 +92,8 @@ class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
 
     @property
     def current_operation(self):
+        if not self._on:
+            return STATE_OFF
         if ATTR_OPERATION_MODE in self.atag.sensordata:
             return self.atag.sensordata[ATTR_OPERATION_MODE]
         return None
@@ -122,9 +130,12 @@ class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
 
     async def async_set_operation_mode(self, operation_mode):
         """Set ATAG ONE mode (auto, manual)."""
-        if not self._on or operation_mode is None:
+        if operation_mode is None:
             return
-        await self.atag.async_set_atag(_target_mode=operation_mode)
+        if operation_mode == STATE_OFF:
+            self._on = False
+        else:
+            await self.atag.async_set_atag(_target_mode=operation_mode)
         self.async_schedule_update_ha_state(True)
 
     async def async_turn_off(self):
