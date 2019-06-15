@@ -4,7 +4,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import CONF_SENSORS
-from pyatag.const import SENSOR_TYPES, ATTR_REPORT_TIME
+from pyatag.const import SENSOR_TYPES
 from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG)
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ async def async_setup_platform(hass, _config, async_add_entities, discovery_info
         if sensor_type not in SENSOR_TYPES:
             _LOGGER.warning("Unknown %s sensor in config", sensor_type)
             SENSOR_TYPES[sensor_type] = [
-                sensor_type.title(), '', 'mdi:flash', sensor_type.title()]
+                sensor_type.title(), '', 'mdi:flash', sensor_type]
 
         entities.append(AtagOneSensor(atag, sensor_type))
 
@@ -87,14 +87,17 @@ class AtagOneSensor(Entity):
         return self._attr
 
     async def async_update(self):
-        """Get the latest data and use it to update our sensor state."""
+        """Update sensor state with latest data."""
+        if self._type == "dhw_water_temp":
+            _LOGGER.debug(self.atag.sensordata)
+            _LOGGER.debug(self._datafield)
+            _LOGGER.debug(self.atag.sensordata[self._datafield])
         try:
-            if isinstance(self.atag.sensordata[self._type], list):
-                self._state = self.atag.sensordata[self._type][0]
-                self._icon = self.atag.sensordata[self._type][1]
+            if isinstance(self.atag.sensordata[self._datafield], list):
+                self._state = self.atag.sensordata[self._datafield][0]
+                self._icon = self.atag.sensordata[self._datafield][1]
             else:
-                self._state = self.atag.sensordata[self._type]
-            self._attr[ATTR_REPORT_TIME] = self.atag.sensordata[ATTR_REPORT_TIME]
+                self._state = self.atag.sensordata[self._datafield]
             return True
         except KeyError:
             _LOGGER.debug('%s failed to update', self._name)

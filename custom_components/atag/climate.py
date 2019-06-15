@@ -2,9 +2,10 @@
 import logging
 from homeassistant.components.climate import (ClimateDevice)
 from homeassistant.components.climate.const import (
-    STATE_AUTO, STATE_MANUAL, SUPPORT_TARGET_TEMPERATURE, SUPPORT_OPERATION_MODE,
-    SUPPORT_TARGET_HUMIDITY_LOW, SUPPORT_TARGET_HUMIDITY_HIGH, ATTR_CURRENT_TEMPERATURE,
-    ATTR_OPERATION_MODE, DEFAULT_MAX_TEMP, DEFAULT_MIN_TEMP, SUPPORT_ON_OFF)
+    STATE_AUTO, STATE_MANUAL,
+    SUPPORT_TARGET_TEMPERATURE, SUPPORT_OPERATION_MODE,
+    ATTR_CURRENT_TEMPERATURE, ATTR_OPERATION_MODE,
+    DEFAULT_MAX_TEMP, DEFAULT_MIN_TEMP)
 from homeassistant.const import (TEMP_CELSIUS, ATTR_TEMPERATURE, STATE_OFF)
 
 from homeassistant.core import callback
@@ -13,20 +14,26 @@ from homeassistant.util.temperature import convert as convert_temperature
 
 from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG)
 
-SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE | SUPPORT_OPERATION_MODE |
-                 SUPPORT_TARGET_HUMIDITY_LOW | SUPPORT_TARGET_HUMIDITY_HIGH | SUPPORT_ON_OFF)
+STATE_EXTEND = 'extend'
 
-OPERATION_LIST = [STATE_MANUAL, STATE_AUTO, STATE_OFF]
+SUPPORT_FLAGS = (SUPPORT_TARGET_TEMPERATURE | SUPPORT_OPERATION_MODE)
+
+OPERATION_LIST = [STATE_MANUAL, STATE_AUTO]
+
+HA_TO_ATAG = {
+    ATTR_OPERATION_MODE: 'ch_mode',
+    ATTR_CURRENT_TEMPERATURE: 'room_temp',
+    ATTR_TEMPERATURE: 'ch_mode_temp',
+    STATE_AUTO: 2,
+    STATE_MANUAL: 1
+}
 
 _LOGGER = logging.getLogger(__name__)
-
-DEVICE_ID = 'device_id'
 
 async def async_setup_platform(hass, _config, async_add_devices,
                                _discovery_info=None):
     """Setup for the Atag One thermostat."""
     async_add_devices([AtagOneThermostat(hass)])
-
 
 class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
     """Representation of the ATAG One thermostat."""
@@ -35,9 +42,7 @@ class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
         """Initialize"""
         _LOGGER.debug("Initializing Atag climate platform")
         self.atag = hass.data[DOMAIN][ATAG_HANDLE]
-        self._name = 'Atag thermostat'
-        self._humidity = None
-        self._on = True
+        self._name = 'Atag'
         self._operation_list = OPERATION_LIST
         _LOGGER.debug("Atag climate initialized")
 
@@ -50,11 +55,6 @@ class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
     def _update_callback(self):
         """Call update method."""
         self.async_schedule_update_ha_state(True)
-
-    @property
-    def device_id(self) -> str:
-        """Return the unique ID for this thermostat."""
-        return self.atag.sensordata[DEVICE_ID]
 
     @property
     def should_poll(self):
@@ -79,23 +79,26 @@ class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        if ATTR_CURRENT_TEMPERATURE in self.atag.sensordata:
-            return self.atag.sensordata[ATTR_CURRENT_TEMPERATURE]
+        field = HA_TO_ATAG[ATTR_CURRENT_TEMPERATURE]
+        if field in self.atag.sensordata:
+            return self.atag.sensordata[field]
         return None
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        if ATTR_TEMPERATURE in self.atag.sensordata:
-            return self.atag.sensordata[ATTR_TEMPERATURE]
+        field = HA_TO_ATAG[ATTR_TEMPERATURE]
+        if field in self.atag.sensordata:
+            return self.atag.sensordata[field]
         return None
 
     @property
     def current_operation(self):
-        if not self._on:
-            return STATE_OFF
-        if ATTR_OPERATION_MODE in self.atag.sensordata:
-            return self.atag.sensordata[ATTR_OPERATION_MODE]
+        field = HA_TO_ATAG[ATTR_OPERATION_MODE]
+        if field in self.atag.sensordata:
+            if self.atag.sensordata[field] == STATE_EXTEND:
+                return STATE_AUTO
+            return self.atag.sensordata[field]
         return None
 
     @property
@@ -115,35 +118,17 @@ class AtagOneThermostat(ClimateDevice):  # pylint: disable=abstract-method
         return convert_temperature(DEFAULT_MIN_TEMP, TEMP_CELSIUS,
                                    self.temperature_unit)
 
-    @property
-    def is_on(self):
-        """Return true if the device is on."""
-        return self._on
-
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
         target_temp = kwargs.get(ATTR_TEMPERATURE)
-        if not self._on or target_temp is None:
+        if target_temp is None:
             return
-        await self.atag.async_set_atag(_target_temp=target_temp)
+        await self.atag.async_set_atag(temperature=target_temp)
         self.async_schedule_update_ha_state(True)
 
     async def async_set_operation_mode(self, operation_mode):
         """Set ATAG ONE mode (auto, manual)."""
         if operation_mode is None:
             return
-        if operation_mode == STATE_OFF:
-            self._on = False
-        else:
-            await self.atag.async_set_atag(_target_mode=operation_mode)
-        self.async_schedule_update_ha_state(True)
-
-    async def async_turn_off(self):
-        """Disable Atag One (HA only)."""
-        self._on = False
-        self.async_schedule_update_ha_state(True)
-
-    async def async_turn_on(self):
-        """Enable Atag One (HA only)."""
-        self._on = True
+        await self.atag.async_set_atag(operation_mode=HA_TO_ATAG[operation_mode])
         self.async_schedule_update_ha_state(True)

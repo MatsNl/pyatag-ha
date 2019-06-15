@@ -1,12 +1,12 @@
 {
-    "domain": "atag",
-    "name": "Atag",
-    "documentation": "https://pypi.org/project/pyatag",
-    "requirements": [
-      "pyatag==0.2.7.3"
-    ],
-    "dependencies": [],
-    "codeowners": [
-      "@MatsNL"
-    ]
-  }
+  "domain": "atag",
+  "name": "Atag",
+  "documentation": "https://pypi.org/project/pyatag",
+  "requirements": [
+    "pyatag==0.2.7.4"
+  ],
+  "dependencies": [],
+  "codeowners": [
+    "@MatsNL"
+  ]
+}

@@ -16,7 +16,7 @@ from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG,
                     DATA_LISTENER, DEFAULT_PORT, DEFAULT_SENSORS,
                     CONF_INTERFACE, DEFAULT_INTERFACE)
 
-VERSION = '0.2.5'
+VERSION = '0.2.3'
 
 DEFAULT_SCAN_INTERVAL = 30
 _LOGGER = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ async def async_setup(hass, config):
 
     hass.data[DOMAIN][ATAG_HANDLE] = atagunit
     _LOGGER.debug('Datastore initialized')
-    for platform in ('sensor', 'climate'):
+    for platform in ('sensor', 'climate', 'water_heater'):
         hass.async_create_task(
             async_load_platform(hass, platform, DOMAIN, {
                                 'sensors': sensors}, config)
