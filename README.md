@@ -16,10 +16,10 @@
 
     ```yaml
      atag:
-       host: atagone.local # in case autodiscovery fails
+       host: # in case autodiscovery fails
        port: 10000 # in case connecting through port redirect
        email: 
-       interface: 'eth0' # in case autodiscovery fails
+       interface:  # in case autodiscovery fails (e.g. 'eth0')
        scan_interval: 
        sensors:
          - device_id
