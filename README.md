@@ -6,10 +6,9 @@
 
     - .homeassistant/custom_components/atag/*.py
   
-2. Add the new platform in the configuration.yaml:
+2. Add the new platform in the configuration.yaml to enable climate, water_heater and default sensors to HA. Uses Auto-discovery if no host data is provided:
 
     ```yaml
-    This adds climate, water_heater and default sensors to HA
      atag:
     ```
 
