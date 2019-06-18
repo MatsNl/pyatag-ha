@@ -1,7 +1,6 @@
-# home-assistant-custom-components
-ATAG ONE Custom Component for Home Assistant
+# ATAG ONE Custom Component for Home Assistant
 
-Components for [ATAG One](https://www.atag-one.com/):
+Component for [ATAG One](https://www.atag-one.com/):
 
 ## Instalation
 
