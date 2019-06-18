@@ -8,6 +8,7 @@
         "remote_location": "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/__init__.py",
         "resources": [
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/climate.py",
+            "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/water_heater.py",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/sensor.py",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/const.py",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/manifest.json",
