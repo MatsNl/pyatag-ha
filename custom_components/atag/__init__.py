@@ -14,9 +14,9 @@ from homeassistant.core import callback, asyncio
 
 from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG,
                     DATA_LISTENER, DEFAULT_PORT, DEFAULT_SENSORS,
-                    CONF_INTERFACE, DEFAULT_INTERFACE)
+                    CONF_INTERFACE)
 
-VERSION = '0.2.6'
+VERSION = '0.2.7'
 
 DEFAULT_SCAN_INTERVAL = 30
 _LOGGER = logging.getLogger(__name__)
@@ -61,7 +61,6 @@ async def async_setup(hass, config):
 
     async def async_hub_refresh(event_time):  # pylint: disable=unused-argument
         """Call Atag to refresh information."""
-        #_LOGGER.debug("Updating Atag component")
         await hass.data[DOMAIN][ATAG_HANDLE].async_update()
         async_dispatcher_send(hass, SIGNAL_UPDATE_ATAG)
 

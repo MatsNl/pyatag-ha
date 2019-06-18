@@ -88,10 +88,6 @@ class AtagOneSensor(Entity):
 
     async def async_update(self):
         """Update sensor state with latest data."""
-        if self._type == "dhw_water_temp":
-            _LOGGER.debug(self.atag.sensordata)
-            _LOGGER.debug(self._datafield)
-            _LOGGER.debug(self.atag.sensordata[self._datafield])
         try:
             if isinstance(self.atag.sensordata[self._datafield], list):
                 self._state = self.atag.sensordata[self._datafield][0]

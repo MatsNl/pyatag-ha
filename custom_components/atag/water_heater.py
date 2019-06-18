@@ -2,8 +2,7 @@
 import logging
 
 from homeassistant.components.water_heater import (
-    ATTR_TEMPERATURE, STATE_ECO, STATE_PERFORMANCE,
-    SUPPORT_OPERATION_MODE, SUPPORT_TARGET_TEMPERATURE, WaterHeaterDevice)
+    ATTR_TEMPERATURE, STATE_ECO, STATE_PERFORMANCE, WaterHeaterDevice)
 from homeassistant.const import STATE_OFF, TEMP_CELSIUS
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -33,28 +32,28 @@ ATAG_STATE_TO_HA = {
     'Idle': STATE_OFF
 }
 
-DHW_SETPOINT = 'dhw_temp_setp' # fixed setpoint
-DHW_TEMPERATURE = 'dhw_mode_temp' # current demand
+DHW_SETPOINT = 'dhw_temp_setp' # water demand setpoint
+DHW_TEMPERATURE = 'dhw_mode_temp' # comfort demand setpoint
 DHW_CURRENT_TEMPERATURE = 'dhw_water_temp' # current water temp
 BOILERSTATUS = 'boiler_status'
 DHW_MAX = 'dhw_max_set'
 DHW_MIN = 'dhw_min_set'
 
 async def async_setup_platform(hass, _config, async_add_devices,
-                               _discovery_info=None): # pylint: disable=abstract-method
+                               _discovery_info=None):
     """Setup for the Atag One thermostat."""
     async_add_devices([AtagOneWaterHeater(hass)])
 
-class AtagOneWaterHeater(WaterHeaterDevice):
+class AtagOneWaterHeater(WaterHeaterDevice): # pylint: disable=abstract-method
     """Representation of an ATAG water heater."""
- 
+
     def __init__(self, hass):
         """Initialize"""
         _LOGGER.debug("Initializing Atag climate platform")
         self.atag = hass.data[DOMAIN][ATAG_HANDLE]
         self._name = 'Atag DHW'
         self._operation_list = OPERATION_LIST
-        _LOGGER.debug("Atag heatpump initialized")
+        _LOGGER.debug("Atag water heater initialized")
 
     @property
     def name(self):
@@ -84,7 +83,6 @@ class AtagOneWaterHeater(WaterHeaterDevice):
     @property
     def temperature_unit(self):
         """Return the unit of measurement."""
-        # The Wink API always returns temp in Celsius
         return TEMP_CELSIUS
 
     @property
@@ -103,7 +101,7 @@ class AtagOneWaterHeater(WaterHeaterDevice):
         "high_demand", "electric_only", "gas]
         """
         if not BOILERSTATUS in self.atag.sensordata:
-            return None 
+            return None
         current_op = ATAG_STATE_TO_HA.get(self.atag.sensordata[BOILERSTATUS])
         if current_op is None:
             current_op = STATE_OFF
@@ -125,7 +123,12 @@ class AtagOneWaterHeater(WaterHeaterDevice):
 
     @property
     def target_temperature(self):
-        """Return the temperature we try to reach."""
+        """Return the setpoint if water demand, otherwise return base temp (comfort level)."""
+        if BOILERSTATUS in self.atag.sensordata and DHW_SETPOINT in self.atag.sensordata:
+            current_op = ATAG_STATE_TO_HA.get(self.atag.sensordata[BOILERSTATUS])
+            if not current_op == STATE_OFF:
+                return self.atag.sensordata[DHW_SETPOINT]
+
         if DHW_TEMPERATURE in self.atag.sensordata:
             temp = self.atag.sensordata[DHW_TEMPERATURE]
             if temp == 150:
