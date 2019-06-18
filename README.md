@@ -9,6 +9,7 @@
 2. Add the new platform in the configuration.yaml:
 
     ```yaml
+    This adds climate, water_heater and default sensors to HA
      atag:
     ```
 
