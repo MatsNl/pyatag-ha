@@ -1,7 +1,5 @@
 # ATAG ONE Custom Component for Home Assistant
 
-Component for [ATAG One](https://www.atag-one.com/):
-
 ## Instalation
 
 1. Add files to custom_components directory or use custom_updater component
@@ -69,12 +67,12 @@ Component for [ATAG One](https://www.atag-one.com/):
     "ch_water_temp", "dhw_water_pres", "ch_water_pres", "ch_return_temp",
     "boiler_status", "boiler_config", "ch_time_to_temp", "shown_set_temp",
     "power_cons", "tout_avg", "rssi", "current", "voltage", "charge_status",
-    "lmuc_burner_starts", "dhw_flow_rate", "resets", "memory_allocation"],
+    "lmuc_burner_starts", "dhw_flow_rate", "resets", "memory_allocation",
     "boiler_temp", "boiler_return_temp", "min_mod_level", "rel_mod_level",
     "boiler_capacity", "target_temp", "overshoot", "max_boiler_temp", "alpha_used",
     "regulation_state", "ch_m_dot_c", "c_house", "r_rad", "r_env", "alpha", "alpha_max",
     "delay", "mu", "threshold_offs", "wd_k_factor ", "wd_exponent",
-    "lmuc_burner_hours", "lmuc_dhw_hours", "KP", "KI"],
+    "lmuc_burner_hours", "lmuc_dhw_hours", "KP", "KI",
     "ch_status", "ch_control_mode", "ch_mode", "ch_mode_duration", "ch_mode_temp",
     "dhw_temp_setp", "dhw_status", "dhw_mode", "dhw_mode_temp", "weather_temp",
     "weather_status", "vacation_duration", "extend_duration", "fireplace_duration"
