@@ -16,7 +16,7 @@ from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG,
                     DATA_LISTENER, DEFAULT_PORT, DEFAULT_SENSORS,
                     CONF_INTERFACE)
 
-VERSION = '0.2.8'
+VERSION = '0.2.9'
 
 DEFAULT_SCAN_INTERVAL = 30
 _LOGGER = logging.getLogger(__name__)
