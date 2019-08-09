@@ -34,6 +34,7 @@ CONFIG_SCHEMA = vol.Schema({
     }),
 }, extra=vol.ALLOW_EXTRA)
 
+
 async def async_setup(hass, config):
     """Iniatilize ATAG Component"""
     conf = config[DOMAIN]

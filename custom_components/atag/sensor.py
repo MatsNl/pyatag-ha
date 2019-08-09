@@ -3,12 +3,17 @@ import logging
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
-from homeassistant.const import CONF_SENSORS
+from homeassistant.const import CONF_SENSORS, DEVICE_CLASS_TEMPERATURE, DEVICE_CLASS_PRESSURE
 from pyatag.const import SENSOR_TYPES
 from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG)
 
 _LOGGER = logging.getLogger(__name__)
 SENSOR_PREFIX = 'Atag '
+
+UNIT_TO_CLASS = {
+    '°C': DEVICE_CLASS_TEMPERATURE,
+    'Bar': DEVICE_CLASS_PRESSURE
+}
 
 async def async_setup_platform(hass, _config, async_add_entities, discovery_info=None):
     """Initialization of ATAG One sensor platform."""
@@ -29,7 +34,6 @@ async def async_setup_platform(hass, _config, async_add_entities, discovery_info
 
     async_add_entities(entities)
 
-
 class AtagOneSensor(Entity):
     """Representation of a AtagOne Sensor."""
 
@@ -43,6 +47,7 @@ class AtagOneSensor(Entity):
         self._datafield = SENSOR_TYPES[self._type][3]
         self._state = None
         self._attr = {}
+        self._device_class = UNIT_TO_CLASS.get(self._unit)
 
         _LOGGER.debug('%s Sensor initialized', self._name)
 
@@ -85,6 +90,11 @@ class AtagOneSensor(Entity):
     def device_state_attributes(self):
         """Return the state attributes of this device."""
         return self._attr
+
+    @property
+    def device_class(self):
+        """Return the device class."""
+        return self._device_class
 
     async def async_update(self):
         """Update sensor state with latest data."""
