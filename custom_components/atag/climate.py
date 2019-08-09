@@ -1,19 +1,11 @@
 """Initialization of ATAG One climate platform."""
 import logging
-<<<<<<< HEAD
 from typing import List, Optional  # Any, Dict
-=======
-from typing import Any, Dict, List, Optional
->>>>>>> e02ea34210afc06ed946edd936ecd8972e67d2b5
 
 from homeassistant.components.climate import (ClimateDevice)
 from homeassistant.components.climate.const import (
     HVAC_MODE_HEAT, HVAC_MODE_AUTO, HVAC_MODE_OFF, ATTR_CURRENT_TEMPERATURE,
-<<<<<<< HEAD
     SUPPORT_TARGET_TEMPERATURE, CURRENT_HVAC_HEAT,  # SUPPORT_PRESET_MODE,
-=======
-    SUPPORT_PRESET_MODE, SUPPORT_TARGET_TEMPERATURE, CURRENT_HVAC_HEAT,
->>>>>>> e02ea34210afc06ed946edd936ecd8972e67d2b5
     CURRENT_HVAC_IDLE, DEFAULT_MIN_TEMP, DEFAULT_MAX_TEMP)
 
 from homeassistant.const import (TEMP_CELSIUS, ATTR_TEMPERATURE)
@@ -44,13 +36,8 @@ ATAG_TO_HA = {
     'Heating Water': CURRENT_HVAC_IDLE,
     'Heating CV': CURRENT_HVAC_HEAT,
     'Heating Boiler': CURRENT_HVAC_HEAT,
-<<<<<<< HEAD
     'Pumping Water': CURRENT_HVAC_IDLE,
     'Pumping CV': CURRENT_HVAC_IDLE,
-=======
-    'Water active': CURRENT_HVAC_IDLE,
-    'CV active': CURRENT_HVAC_IDLE,
->>>>>>> e02ea34210afc06ed946edd936ecd8972e67d2b5
     'Idle': CURRENT_HVAC_IDLE,
     'Weather based': HVAC_MODE_AUTO,
     'Thermostat': HVAC_MODE_HEAT
@@ -166,11 +153,7 @@ class AtagOneThermostat(ClimateDevice, RestoreEntity):
     async def async_set_temperature(self, **kwargs) -> None:
         """Set new target temperature."""
         target_temp = kwargs.get(ATTR_TEMPERATURE)
-<<<<<<< HEAD
         if target_temp is None or not self._on:
-=======
-        if target_temp is None:
->>>>>>> e02ea34210afc06ed946edd936ecd8972e67d2b5
             return None
         await self.atag.async_set_atag(temperature=target_temp)
         self.async_schedule_update_ha_state(True)
@@ -186,17 +169,10 @@ class AtagOneThermostat(ClimateDevice, RestoreEntity):
         self._on = True
         field = CH_CONTROL_MODE
         if ATAG_TO_HA.get(self.atag.sensordata.get(field)) == hvac_mode:
-<<<<<<< HEAD
             _LOGGER.debug("Already on %s mode, no API call", hvac_mode)
             self.async_schedule_update_ha_state(True)
             return None
         _LOGGER.debug("Setting Atag to %s mode", hvac_mode)
-=======
-            _LOGGER.debug("Already on {} mode, no API call".format(hvac_mode))
-            self.async_schedule_update_ha_state(True)
-            return None
-        _LOGGER.debug("Setting Atag to {} mode".format(hvac_mode))
->>>>>>> e02ea34210afc06ed946edd936ecd8972e67d2b5
         await self.atag.async_set_atag(ch_control_mode=HA_TO_ATAG[hvac_mode])
         self.async_schedule_update_ha_state(True)
         return None
