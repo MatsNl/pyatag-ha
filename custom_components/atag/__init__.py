@@ -7,6 +7,7 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.const import (CONF_HOST, CONF_PORT, CONF_EMAIL, CONF_SCAN_INTERVAL,
                                  CONF_SENSORS, EVENT_HOMEASSISTANT_STOP)
@@ -45,12 +46,12 @@ async def async_setup(hass, config):
     port = conf.get(CONF_PORT)
     scan_interval = conf.get(CONF_SCAN_INTERVAL)
     sensors = conf.get(CONF_SENSORS)
-    httpsession = hass.helpers.aiohttp_client.async_get_clientsession()
+    session = async_get_clientsession(hass)
 
     _LOGGER.debug('Initializing ATAG...')
     from pyatag.gateway import AtagDataStore
     atagunit = AtagDataStore(
-        host=host, port=port, mail=email, interface=interface, session=httpsession)
+        host=host, port=port, mail=email, interface=interface, session=session)
 
     hass.data[DOMAIN][ATAG_HANDLE] = atagunit
     _LOGGER.debug('Datastore initialized')
@@ -67,6 +68,7 @@ async def async_setup(hass, config):
 
     async def async_close_atag(event):  # pylint: disable=unused-argument
         """Close Atag connection on HA Stop."""
+        _LOGGER.debug('Closing connection to ATAG...')
         await hass.data[DOMAIN][ATAG_HANDLE].async_close()
 
     hass.services.async_register(DOMAIN, 'update', async_hub_refresh)

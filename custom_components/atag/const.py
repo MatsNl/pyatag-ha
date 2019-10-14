@@ -25,10 +25,14 @@ DEFAULT_SENSORS = [
     #   'boiler_config',
     'burning_hours',
     'flame_level',
-    "ch_status",
+    #"ch_status",
     #   "ch_control_mode",
     #  "dhw_temp_setp",
     #    "dhw_status",
     #    "dhw_mode",
     #    "dhw_mode_temp",
 ]
+
+# TODO: to be moved to library + pulled from device
+PROJECT_URL = 'https://www.atag-one.com'
+VERSION = 'R58'

@@ -15,13 +15,14 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util.temperature import convert as convert_temperature
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG)
+from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG, PROJECT_URL, VERSION)
 
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE  # | SUPPORT_PRESET_MODE
 SUPPORT_PRESET = []  # [PRESET_AWAY, PRESET_COMFORT, PRESET_HOME, PRESET_SLEEP]
 
 BOILER_STATUS = 'boiler_status'
 CH_CONTROL_MODE = 'ch_control_mode'
+
 
 HA_TO_ATAG = {
     # ATTR_OPERATION_MODE: 'ch_mode',
@@ -150,29 +151,46 @@ class AtagOneThermostat(ClimateDevice, RestoreEntity):
         return convert_temperature(DEFAULT_MIN_TEMP, TEMP_CELSIUS,
                                    self.temperature_unit)
 
+    @property
+    def unique_id(self):
+        """Return a unique ID to use for this sensor."""
+        return (
+            "ATAG Thermostat"
+        )
+
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.unique_id)},
+            "name": self._name,
+            "sw_version": VERSION,
+            "manufacturer": PROJECT_URL
+        }
+
+
     async def async_set_temperature(self, **kwargs) -> None:
         """Set new target temperature."""
         target_temp = kwargs.get(ATTR_TEMPERATURE)
         if target_temp is None or not self._on:
             return None
         await self.atag.async_set_atag(temperature=target_temp)
-        self.async_schedule_update_ha_state(True)
+        # self.async_schedule_update_ha_state(True)
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
         if hvac_mode == HVAC_MODE_OFF:
             _LOGGER.debug("Turning off climate")
             self._on = False
-            self.async_schedule_update_ha_state(True)
+            self.async_schedule_update_ha_state()
             return None
 
         self._on = True
         field = CH_CONTROL_MODE
         if ATAG_TO_HA.get(self.atag.sensordata.get(field)) == hvac_mode:
             _LOGGER.debug("Already on %s mode, no API call", hvac_mode)
-            self.async_schedule_update_ha_state(True)
-            return None
+            self.async_schedule_update_ha_state()
+            return
         _LOGGER.debug("Setting Atag to %s mode", hvac_mode)
         await self.atag.async_set_atag(ch_control_mode=HA_TO_ATAG[hvac_mode])
-        self.async_schedule_update_ha_state(True)
-        return None
+        self.async_schedule_update_ha_state()
+        return

@@ -8,7 +8,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util.temperature import convert as convert_temperature
 
-from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG)
+from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG,PROJECT_URL,VERSION)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -153,3 +153,19 @@ class AtagOneWaterHeater(WaterHeaterDevice): # pylint: disable=abstract-method
             return convert_temperature(temp, TEMP_CELSIUS,
                                        self.temperature_unit)
         return None
+
+    @property
+    def unique_id(self):
+        """Return a unique ID to use for this sensor."""
+        return (
+            "ATAG Water Heater"
+        )
+
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.unique_id)},
+            "name": self._name,
+            "sw_version": VERSION,
+            "manufacturer": PROJECT_URL
+        }

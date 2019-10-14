@@ -5,7 +5,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import CONF_SENSORS, DEVICE_CLASS_TEMPERATURE, DEVICE_CLASS_PRESSURE
 from pyatag.const import SENSOR_TYPES
-from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG)
+from .const import (DOMAIN, ATAG_HANDLE, SIGNAL_UPDATE_ATAG, PROJECT_URL, VERSION)
 
 _LOGGER = logging.getLogger(__name__)
 SENSOR_PREFIX = 'Atag '
@@ -95,6 +95,22 @@ class AtagOneSensor(Entity):
     def device_class(self):
         """Return the device class."""
         return self._device_class
+
+    @property
+    def unique_id(self):
+        """Return a unique ID to use for this sensor."""
+        return (
+            "ATAG-{}".format(self._type)
+        )
+
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self.unique_id)},
+            "name": self._name,
+            "sw_version": VERSION,
+            "manufacturer": PROJECT_URL
+        }
 
     async def async_update(self):
         """Update sensor state with latest data."""
