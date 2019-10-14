@@ -8,11 +8,13 @@ from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util.temperature import convert as convert_temperature
 
-from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG,PROJECT_URL,VERSION)
+from .const import (ATAG_HANDLE, DOMAIN,
+                    SIGNAL_UPDATE_ATAG, PROJECT_URL, VERSION)
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORT_FLAGS_HEATER = 0 # (SUPPORT_TARGET_TEMPERATURE | SUPPORT_OPERATION_MODE )
+# (SUPPORT_TARGET_TEMPERATURE | SUPPORT_OPERATION_MODE )
+SUPPORT_FLAGS_HEATER = 0
 
 OPERATION_LIST = [STATE_OFF, STATE_ECO, STATE_PERFORMANCE]
 
@@ -32,19 +34,21 @@ ATAG_STATE_TO_HA = {
     'Idle': STATE_OFF
 }
 
-DHW_SETPOINT = 'dhw_temp_setp' # water demand setpoint
-DHW_TEMPERATURE = 'dhw_mode_temp' # comfort demand setpoint
-DHW_CURRENT_TEMPERATURE = 'dhw_water_temp' # current water temp
+DHW_SETPOINT = 'dhw_temp_setp'  # water demand setpoint
+DHW_TEMPERATURE = 'dhw_mode_temp'  # comfort demand setpoint
+DHW_CURRENT_TEMPERATURE = 'dhw_water_temp'  # current water temp
 BOILERSTATUS = 'boiler_status'
 DHW_MAX = 'dhw_max_set'
 DHW_MIN = 'dhw_min_set'
+
 
 async def async_setup_platform(hass, _config, async_add_devices,
                                _discovery_info=None):
     """Setup for the Atag One thermostat."""
     async_add_devices([AtagOneWaterHeater(hass)])
 
-class AtagOneWaterHeater(WaterHeaterDevice): # pylint: disable=abstract-method
+
+class AtagOneWaterHeater(WaterHeaterDevice):  # pylint: disable=abstract-method
     """Representation of an ATAG water heater."""
 
     def __init__(self, hass):
@@ -125,7 +129,8 @@ class AtagOneWaterHeater(WaterHeaterDevice): # pylint: disable=abstract-method
     def target_temperature(self):
         """Return the setpoint if water demand, otherwise return base temp (comfort level)."""
         if BOILERSTATUS in self.atag.sensordata and DHW_SETPOINT in self.atag.sensordata:
-            current_op = ATAG_STATE_TO_HA.get(self.atag.sensordata[BOILERSTATUS])
+            current_op = ATAG_STATE_TO_HA.get(
+                self.atag.sensordata[BOILERSTATUS])
             if not current_op == STATE_OFF:
                 return self.atag.sensordata[DHW_SETPOINT]
 
