@@ -1,0 +1,19 @@
+{
+    "config": {
+        "title": "Atag",
+        "step": {
+            "user": {
+                "title": "Atag",
+                "description": "Provide Atag connection info.",
+                "data": {
+                    "host": "Hostname",
+                    "email": "Email address"
+                }
+            }
+        },
+        "error": {
+            "identifier_exists": "Device already set up",
+            "connection_error": "Connection failed, confirm configuration"
+        }
+    }
+}
