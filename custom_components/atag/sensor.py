@@ -58,6 +58,6 @@ class AtagOneSensor(AtagEntity):
         if isinstance(data, list):
             self._state = data[0]
             self._icon = data[1]
-        elif data:
+        elif data is not None:
             self._state = data
 
