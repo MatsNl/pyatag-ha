@@ -4,7 +4,7 @@
   "config_flow": true,
   "documentation": "https://pypi.org/project/pyatag",
   "requirements": [
-    "pyatag==0.2.7.12"
+    "pyatag==0.2.7.13"
   ],
   "dependencies": [],
   "codeowners": [
