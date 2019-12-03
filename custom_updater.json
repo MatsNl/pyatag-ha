@@ -1,6 +1,6 @@
 {
     "atag": {
-        "updated_at": "2019-05-17",
+        "updated_at": "2019-12-03",
         "local_location": "/custom_components/atag/__init__.py",
         "version": "0.2.9.1",
         "changelog": "https://github.com/MatsNl/pyatag-ha",

@@ -1,97 +1,86 @@
 """Initialization of ATAG One climate platform."""
 import logging
-from typing import List, Optional  # Any, Dict
+from typing import List, Optional
 
-from homeassistant.components.climate import (ClimateDevice)
+from homeassistant.components.climate import ClimateDevice
 from homeassistant.components.climate.const import (
-    HVAC_MODE_HEAT, HVAC_MODE_AUTO, HVAC_MODE_OFF, ATTR_CURRENT_TEMPERATURE,
-    SUPPORT_TARGET_TEMPERATURE, CURRENT_HVAC_HEAT,  # SUPPORT_PRESET_MODE,
-    CURRENT_HVAC_IDLE, DEFAULT_MIN_TEMP, DEFAULT_MAX_TEMP)
+    HVAC_MODE_HEAT,
+    HVAC_MODE_AUTO,
+    HVAC_MODE_OFF,
+    ATTR_CURRENT_TEMPERATURE,
+    SUPPORT_TARGET_TEMPERATURE,
+    CURRENT_HVAC_HEAT,  # SUPPORT_PRESET_MODE,
+    CURRENT_HVAC_IDLE,
+    DEFAULT_MIN_TEMP,
+    DEFAULT_MAX_TEMP,
+)
 
-from homeassistant.const import (TEMP_CELSIUS, ATTR_TEMPERATURE)
-
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.util.temperature import convert as convert_temperature
+from homeassistant.const import TEMP_CELSIUS, ATTR_TEMPERATURE
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import (ATAG_HANDLE, DOMAIN, SIGNAL_UPDATE_ATAG, PROJECT_URL, VERSION)
+from . import AtagEntity
+from .const import DOMAIN, ATAG_HANDLE
 
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE  # | SUPPORT_PRESET_MODE
 SUPPORT_PRESET = []  # [PRESET_AWAY, PRESET_COMFORT, PRESET_HOME, PRESET_SLEEP]
 
-BOILER_STATUS = 'boiler_status'
-CH_CONTROL_MODE = 'ch_control_mode'
-
+BOILER_STATUS = "boiler_status"
+CH_CONTROL_MODE = "ch_control_mode"
 
 HA_TO_ATAG = {
     # ATTR_OPERATION_MODE: 'ch_mode',
-    ATTR_CURRENT_TEMPERATURE: 'room_temp',
-    ATTR_TEMPERATURE: 'ch_mode_temp',
+    ATTR_CURRENT_TEMPERATURE: "room_temp",
+    ATTR_TEMPERATURE: "ch_mode_temp",
     HVAC_MODE_AUTO: 1,
-    HVAC_MODE_HEAT: 0
+    HVAC_MODE_HEAT: 0,
 }
 
 ATAG_TO_HA = {
-    'Heating CV & Water': CURRENT_HVAC_HEAT,
-    'Heating Water': CURRENT_HVAC_IDLE,
-    'Heating CV': CURRENT_HVAC_HEAT,
-    'Heating Boiler': CURRENT_HVAC_HEAT,
-    'Pumping Water': CURRENT_HVAC_IDLE,
-    'Pumping CV': CURRENT_HVAC_IDLE,
-    'Idle': CURRENT_HVAC_IDLE,
-    'Weather based': HVAC_MODE_AUTO,
-    'Thermostat': HVAC_MODE_HEAT
+    "Heating CV & Water": CURRENT_HVAC_HEAT,
+    "Heating Water": CURRENT_HVAC_IDLE,
+    "Heating CV": CURRENT_HVAC_HEAT,
+    "Heating Boiler": CURRENT_HVAC_HEAT,
+    "Pumping Water": CURRENT_HVAC_IDLE,
+    "Pumping CV": CURRENT_HVAC_IDLE,
+    "Idle": CURRENT_HVAC_IDLE,
+    "Weather based": HVAC_MODE_AUTO,
+    "Thermostat": HVAC_MODE_HEAT,
 }
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, _config, async_add_devices,
-                               _discovery_info=None):
-    """Setup for the Atag One thermostat."""
-    async_add_devices([AtagOneThermostat(hass)])
+async def async_setup_platform(hass, _config, async_add_devices, _discovery_info=None):
+    """Atag updated to use config entry."""
+    pass
+
+
+async def async_setup_entry(hass, entry, async_add_devices):
+    """Load a config entry"""
+    atag = hass.data[DOMAIN][ATAG_HANDLE][entry.entry_id]
+    async_add_devices([AtagOneThermostat(atag, "Thermostat")])
 
 
 # pylint: disable=abstract-method
-class AtagOneThermostat(ClimateDevice, RestoreEntity):
-    """Representation of the ATAG One thermostat."""
+class AtagOneThermostat(AtagEntity, ClimateDevice, RestoreEntity):
+    """Atag climate device"""
 
-    def __init__(self, hass):
-        """Initialize"""
-        _LOGGER.debug("Initializing Atag climate platform")
-        self.atag = hass.data[DOMAIN][ATAG_HANDLE]
-        self._name = 'Atag'
+    def __init__(self, atag, atagtype):
+        """Initialize with fake on/off state"""
+        super().__init__(atag, atagtype)
         self._on = None
 
     async def async_added_to_hass(self):
         """Register callbacks & state restore for fake "Off" mode."""
-        async_dispatcher_connect(
-            self.hass, SIGNAL_UPDATE_ATAG, self._update_callback)
         await super().async_added_to_hass()
         last_state = await self.async_get_last_state()
         if last_state:
             self._on = last_state.state != HVAC_MODE_OFF
 
-    @callback
-    def _update_callback(self):
-        """Call update method."""
-        self.async_schedule_update_ha_state(True)
-
-    @property
-    def should_poll(self):
-        """Polling needed for thermostat."""
-        return False
-
     @property
     def supported_features(self):
         """Return the list of supported features."""
         return SUPPORT_FLAGS
-
-    @property
-    def name(self):
-        """Return the name of the thermostat."""
-        return self._name
 
     @property
     def hvac_mode(self) -> Optional[str]:
@@ -127,52 +116,29 @@ class AtagOneThermostat(ClimateDevice, RestoreEntity):
     def current_temperature(self) -> Optional[float]:
         """Return the current temperature."""
         field = HA_TO_ATAG[ATTR_CURRENT_TEMPERATURE]
-        if field in self.atag.sensordata:
-            return self.atag.sensordata[field]
-        return None
+        return self.atag.sensordata.get(field)
 
     @property
     def target_temperature(self) -> Optional[float]:
         """Return the temperature we try to reach."""
         field = HA_TO_ATAG[ATTR_TEMPERATURE]
-        if field in self.atag.sensordata:
-            return self.atag.sensordata[field]
-        return None
+        return self.atag.sensordata.get(field)
 
     @property
     def max_temp(self):
         """Return the maximum temperature."""
-        return convert_temperature(DEFAULT_MAX_TEMP, TEMP_CELSIUS,
-                                   self.temperature_unit)
+        return DEFAULT_MAX_TEMP
 
     @property
     def min_temp(self):
         """Return the minimum temperature."""
-        return convert_temperature(DEFAULT_MIN_TEMP, TEMP_CELSIUS,
-                                   self.temperature_unit)
-
-    @property
-    def unique_id(self):
-        """Return a unique ID to use for this sensor."""
-        return (
-            "ATAG Thermostat"
-        )
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {(DOMAIN, self.unique_id)},
-            "name": self._name,
-            "sw_version": VERSION,
-            "manufacturer": PROJECT_URL
-        }
-
+        return DEFAULT_MIN_TEMP
 
     async def async_set_temperature(self, **kwargs) -> None:
         """Set new target temperature."""
         target_temp = kwargs.get(ATTR_TEMPERATURE)
         if target_temp is None or not self._on:
-            return None
+            return
         await self.atag.async_set_atag(temperature=target_temp)
         # self.async_schedule_update_ha_state(True)
 
@@ -182,12 +148,11 @@ class AtagOneThermostat(ClimateDevice, RestoreEntity):
             _LOGGER.debug("Turning off climate")
             self._on = False
             self.async_schedule_update_ha_state()
-            return None
-
+            return
         self._on = True
         field = CH_CONTROL_MODE
         if ATAG_TO_HA.get(self.atag.sensordata.get(field)) == hvac_mode:
-            _LOGGER.debug("Already on %s mode, no API call", hvac_mode)
+            _LOGGER.debug("Already on %s mode, no API call needed", hvac_mode)
             self.async_schedule_update_ha_state()
             return
         _LOGGER.debug("Setting Atag to %s mode", hvac_mode)
