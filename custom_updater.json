@@ -1,17 +1,19 @@
 {
     "atag": {
-        "updated_at": "2019-12-03",
+        "updated_at": "2019-12-15",
         "local_location": "/custom_components/atag/__init__.py",
-        "version": "0.2.9.1",
+        "version": "0.2.9.2",
         "changelog": "https://github.com/MatsNl/pyatag-ha",
         "visit_repo": "https://github.com/MatsNl/pyatag-ha",
         "remote_location": "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/__init__.py",
         "resources": [
+            "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/config_flow.py",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/climate.py",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/water_heater.py",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/sensor.py",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/const.py",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/manifest.json",
+            "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/strings.json",
             "https://raw.githubusercontent.com/MatsNl/pyatag-ha/master/custom_components/atag/services.yaml"
         ]
     }
