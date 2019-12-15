@@ -36,4 +36,3 @@ class AtagOneSensor(AtagEntity):
             self._state, self._icon = data
         else:
             self._state = data
-
