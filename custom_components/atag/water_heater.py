@@ -18,6 +18,7 @@ SUPPORT_FLAGS_HEATER = 0
 
 OPERATION_LIST = [STATE_OFF, STATE_ECO, STATE_PERFORMANCE]
 
+
 async def async_setup_platform(hass, config, async_add_devices, _discovery_info=None):
     """Atag updated to use config entry."""
     pass

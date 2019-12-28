@@ -20,4 +20,3 @@ DEFAULT_SENSORS = [
     "burning_hours",
     "flame_level",
 ]
-

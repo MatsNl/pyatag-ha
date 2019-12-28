@@ -1,11 +1,16 @@
 """The ATAG Integration"""
 from datetime import timedelta
 from pyatag import AtagDataStore, SENSOR_TYPES, AtagException
+import voluptuous as vol
 
 from homeassistant.core import callback, asyncio, HomeAssistant
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers import device_registry as dr, dispatcher
+from homeassistant.helpers import (
+    device_registry as dr,
+    dispatcher,
+    config_validation as cv,
+)
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_time_interval
@@ -26,9 +31,31 @@ from .const import (
     DATA_LISTENER,
     PROJECT_URL,
     UNIT_TO_CLASS,
+    DEFAULT_PORT,
+    DEFAULT_SENSORS,
+    DEFAULT_SCAN_INTERVAL,
 )
 
 PLATFORMS = ["sensor", "climate", "water_heater"]
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        DOMAIN: vol.Schema(
+            {
+                vol.Optional(CONF_HOST): cv.string,
+                vol.Optional(CONF_EMAIL): cv.string,
+                vol.Required(CONF_PORT, default=DEFAULT_PORT): cv.port,
+                vol.Required(
+                    CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                ): cv.positive_int,
+                vol.Required(CONF_SENSORS, default=DEFAULT_SENSORS): vol.All(
+                    cv.ensure_list, [vol.In(DEFAULT_SENSORS)]
+                ),
+            }
+        )
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 
 
 async def async_setup(hass: HomeAssistant, config):
@@ -38,7 +65,7 @@ async def async_setup(hass: HomeAssistant, config):
 
     conf = config[DOMAIN]
 
-    if any(conf[CONF_HOST] in host for host in config_flow.configured_hosts(hass)):
+    if any(conf.get(CONF_HOST) in host for host in config_flow.configured_hosts(hass)):
         return True
 
     hass.async_create_task(
@@ -52,13 +79,9 @@ async def async_setup(hass: HomeAssistant, config):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Atag integration from a config entry."""
-    device = entry.data.get(CONF_DEVICE)
-    host = entry.data.get(CONF_HOST)
-    mail = entry.data.get(CONF_EMAIL)
-    port = entry.data.get(CONF_PORT)
     session = async_get_clientsession(hass)
+    atag = AtagDataStore(session, paired=True, **entry.data)
 
-    atag = AtagDataStore(session, host, port, device, mail=mail, paired=True)
     try:
         await atag.async_update()
         if not atag.sensordata:
@@ -70,7 +93,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     device_registry = await dr.async_get_registry(hass)
     device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
-        identifiers={(DOMAIN, device, host)},
+        identifiers={(DOMAIN, atag.device, atag.config.host)},
         manufacturer=PROJECT_URL,
         name="Atag",
         model="Atag One",
@@ -202,4 +225,3 @@ class AtagEntity(Entity):
     def unique_id(self):
         """Return a unique ID to use for this entity."""
         return "-".join([DOMAIN.title(), self._type, self.atag.device])
-
