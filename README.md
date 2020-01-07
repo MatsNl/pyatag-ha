@@ -2,7 +2,7 @@
 
 ## Instalation
 
-1. Add files to custom_components directory or use custom_updater component
+1. Add files to custom_components directory or use HACS
 
    - .homeassistant/custom_components/atag/\*.py
 
